@@ -65,8 +65,20 @@ src/
 - `POST /api/auth/register` — creates user, returns success message
 
 ## Testing
-- Jest + React Native Testing Library (setup in future iteration)
-- Maestro for E2E testing (optional, setup in future iteration)
+- **Unit Tests**: Jest + React Native Testing Library — `npm test`
+- **E2E Tests**: Maestro — `.maestro/` flow files
+
+## Pre-Push Build Verification
+
+**Always run type checking and expo-doctor locally before pushing to CI:**
+```bash
+npx tsc --noEmit && npx expo-doctor
+```
+
+**Important constraints:**
+- **NativeWind only supports Tailwind CSS v3** — do NOT upgrade to Tailwind v4
+- **Pin Expo SDK peer dependencies** — use exact versions (no `^` prefix) for packages like `react-dom`, `react-native-svg` that Expo SDK expects specific versions of. Run `npx expo-doctor` to check.
+- **Jest must match Expo SDK** — use `~29.7.0` (Expo SDK 54 expects Jest 29, not 30+)
 
 ## Deployment
 - **Development**: Expo Go app (scan QR code)
