@@ -1,8 +1,6 @@
 import { config as defaultConfig } from '@gluestack-ui/config'
 
-export const config = {
-  ...defaultConfig.theme,
-}
+export const config = defaultConfig
 
 export type Config = typeof config
 
