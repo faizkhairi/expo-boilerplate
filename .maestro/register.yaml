@@ -1,0 +1,17 @@
+appId: com.expo.expoboilerplate
+---
+# Basic registration flow E2E test using Maestro
+# Run with: maestro test .maestro/register.yaml
+
+- launchApp
+- tapOn: "Register"
+- inputText:
+    text: "newuser@example.com"
+- tapOn: "Password"
+- inputText:
+    text: "password123"
+- tapOn: "Confirm Password"
+- inputText:
+    text: "password123"
+- tapOn: "Create Account"
+- assertVisible: "Check Your Email"

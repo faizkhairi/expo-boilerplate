@@ -1,0 +1,14 @@
+appId: com.expo.expoboilerplate
+---
+# Basic login flow E2E test using Maestro
+# Run with: maestro test .maestro/login.yaml
+
+- launchApp
+- tapOn: "Login"
+- inputText:
+    text: "test@example.com"
+- tapOn: "Password"
+- inputText:
+    text: "password123"
+- tapOn: "Sign In"
+- assertVisible: "Dashboard"
