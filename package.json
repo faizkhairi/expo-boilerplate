@@ -1,7 +1,7 @@
 {
   "name": "expo-boilerplate",
   "version": "1.0.0",
-  "description": "Production-ready Expo (React Native) boilerplate with Expo Router, NativeWind, Zustand, JWT auth, and EAS Build. Zero external dependencies.",
+  "description": "Expo (React Native) starter: Expo Router, NativeWind, Zustand, JWT auth, EAS Build. No third-party SaaS accounts required.",
   "author": "Faiz Khairi <ifaizkhairi@gmail.com> (https://faizkhairi.github.io)",
   "license": "MIT",
   "main": "expo-router/entry",

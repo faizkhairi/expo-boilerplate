@@ -1,6 +1,6 @@
 # Expo Boilerplate
 
-Production-ready Expo mobile boilerplate — zero external account dependencies (except free Expo account for EAS Build). Cross-platform app with auth, state management, and modern UI.
+Expo (React Native) starter template: no third-party SaaS accounts required (except a free Expo account for EAS Build). Cross-platform app with auth, state management, and modern UI.
 
 ## Features
 
