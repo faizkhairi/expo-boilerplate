@@ -13,6 +13,8 @@ const api = axios.create({
   },
 });
 
+const AUTH_ATTEMPT_PATHS = ['/auth/login', '/auth/register'];
+
 // Request interceptor to add auth token
 api.interceptors.request.use(
   (config) => {
@@ -29,8 +31,11 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
-    if (error.response?.status === 401) {
-      // Token expired or invalid - logout user
+    // A 401 from login or register means bad credentials, not an expired
+    // session, so only other endpoints sign the user out.
+    const url: string = error.config?.url ?? '';
+    const isAuthAttempt = AUTH_ATTEMPT_PATHS.some((path) => url.startsWith(path));
+    if (error.response?.status === 401 && !isAuthAttempt) {
       await useAuthStore.getState().logout();
     }
     return Promise.reject(error);

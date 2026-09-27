@@ -12,7 +12,7 @@ module.exports = {
   // Floors sit just under the measured coverage (rounded down to 5) so a
   // change that drops coverage fails CI. Raise them as tests are added.
   coverageThreshold: {
-    global: { statements: 25, branches: 15, functions: 15, lines: 25 },
+    global: { statements: 50, branches: 35, functions: 35, lines: 55 },
   },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
   testPathIgnorePatterns: ['/node_modules/', '/e2e/'],

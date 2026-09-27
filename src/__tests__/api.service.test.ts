@@ -77,6 +77,16 @@ describe('API Service', () => {
       expect(logoutSpy).toHaveBeenCalledTimes(1);
     });
 
+    it.each(['/auth/login', '/auth/register'])(
+      'does not log out on a 401 from %s (wrong credentials)',
+      async (path) => {
+        respondWith(401);
+
+        await expect(api.post(path, {})).rejects.toMatchObject({ response: { status: 401 } });
+        expect(logoutSpy).not.toHaveBeenCalled();
+      }
+    );
+
     it('rejects other errors without logging out', async () => {
       respondWith(500);
 
