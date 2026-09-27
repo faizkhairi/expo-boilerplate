@@ -9,7 +9,7 @@ export default function NotFoundScreen() {
         <Text className="text-6xl font-bold text-gray-900 mb-4">404</Text>
         <Text className="text-2xl font-semibold text-gray-900 mb-2">Page not found</Text>
         <Text className="text-gray-600 mb-8 text-center">
-          The page you're looking for doesn't exist.
+          The page you&apos;re looking for doesn&apos;t exist.
         </Text>
         <Link href="/" asChild>
           <TouchableOpacity className="bg-blue-600 rounded-lg px-6 py-3">

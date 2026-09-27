@@ -4,6 +4,8 @@ import { useAuthStore } from '../stores/auth';
 // Replace with your actual API URL
 const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3000/api';
 
+// axios.create is the documented way to build an instance.
+// eslint-disable-next-line import/no-named-as-default-member
 const api = axios.create({
   baseURL: API_URL,
   headers: {

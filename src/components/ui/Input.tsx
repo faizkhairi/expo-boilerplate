@@ -2,7 +2,6 @@ import {
   Input as GlueInput,
   InputField,
   InputSlot,
-  InputIcon,
 } from '@gluestack-ui/themed'
 import type { ComponentProps } from 'react'
 
