@@ -33,8 +33,10 @@ api.interceptors.response.use(
   async (error) => {
     // A 401 from login or register means bad credentials, not an expired
     // session, so only other endpoints sign the user out.
-    const url: string = error.config?.url ?? '';
-    const isAuthAttempt = AUTH_ATTEMPT_PATHS.some((path) => url.startsWith(path));
+    // Exact match (query string ignored), so a route such as
+    // /auth/login-history still signs the user out on a 401.
+    const path = (error.config?.url ?? '').split('?')[0];
+    const isAuthAttempt = AUTH_ATTEMPT_PATHS.includes(path);
     if (error.response?.status === 401 && !isAuthAttempt) {
       await useAuthStore.getState().logout();
     }
