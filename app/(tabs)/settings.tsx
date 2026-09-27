@@ -47,9 +47,9 @@ export default function SettingsScreen() {
           <View className="bg-gray-50 rounded-lg p-6 border border-gray-200">
             <Text className="text-base font-semibold text-gray-900 mb-3">Tech Stack</Text>
             <View className="space-y-1">
-              <Text className="text-gray-700">• Expo SDK 54</Text>
-              <Text className="text-gray-700">• React Native 0.81</Text>
-              <Text className="text-gray-700">• Expo Router v6</Text>
+              <Text className="text-gray-700">• Expo SDK 57</Text>
+              <Text className="text-gray-700">• React Native 0.86</Text>
+              <Text className="text-gray-700">• Expo Router 57</Text>
               <Text className="text-gray-700">• NativeWind (Tailwind)</Text>
               <Text className="text-gray-700">• Zustand + expo-secure-store</Text>
             </View>
