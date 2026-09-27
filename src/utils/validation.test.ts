@@ -1,4 +1,3 @@
-import { describe, it, expect } from 'vitest';
 import { isNonEmptyString, isValidEmail } from './validation';
 
 describe('validation', () => {

@@ -21,7 +21,7 @@ describe('Auth Store', () => {
 
   describe('login', () => {
     it('should save token and user to secure store', async () => {
-      const { result } = renderHook(() => useAuthStore());
+      const { result } = await renderHook(() => useAuthStore());
 
       const mockToken = 'test-token';
       const mockUser = { id: '1', email: 'test@example.com', name: 'Test User' };
@@ -35,7 +35,7 @@ describe('Auth Store', () => {
     });
 
     it('should update store state after login', async () => {
-      const { result } = renderHook(() => useAuthStore());
+      const { result } = await renderHook(() => useAuthStore());
 
       const mockToken = 'test-token';
       const mockUser = { id: '1', email: 'test@example.com', name: 'Test User' };
@@ -52,7 +52,7 @@ describe('Auth Store', () => {
     it('should throw error if SecureStore fails', async () => {
       (SecureStore.setItemAsync as jest.Mock).mockRejectedValueOnce(new Error('Storage error'));
 
-      const { result } = renderHook(() => useAuthStore());
+      const { result } = await renderHook(() => useAuthStore());
 
       const mockToken = 'test-token';
       const mockUser = { id: '1', email: 'test@example.com', name: 'Test User' };
@@ -63,7 +63,7 @@ describe('Auth Store', () => {
 
   describe('logout', () => {
     it('should clear token and user from secure store', async () => {
-      const { result } = renderHook(() => useAuthStore());
+      const { result } = await renderHook(() => useAuthStore());
 
       // Set up authenticated state
       const mockUser = { id: '1', email: 'test@example.com', name: 'Test User' };
@@ -81,7 +81,7 @@ describe('Auth Store', () => {
     });
 
     it('should clear store state after logout', async () => {
-      const { result } = renderHook(() => useAuthStore());
+      const { result } = await renderHook(() => useAuthStore());
 
       // Set up authenticated state
       const mockUser = { id: '1', email: 'test@example.com', name: 'Test User' };
@@ -102,7 +102,7 @@ describe('Auth Store', () => {
     it('should not throw if SecureStore fails during logout', async () => {
       (SecureStore.deleteItemAsync as jest.Mock).mockRejectedValueOnce(new Error('Delete error'));
 
-      const { result } = renderHook(() => useAuthStore());
+      const { result } = await renderHook(() => useAuthStore());
 
       await expect(result.current.logout()).resolves.not.toThrow();
     });
@@ -119,7 +119,7 @@ describe('Auth Store', () => {
         return Promise.resolve(null);
       });
 
-      const { result } = renderHook(() => useAuthStore());
+      const { result } = await renderHook(() => useAuthStore());
 
       await act(async () => {
         await result.current.loadToken();
@@ -134,7 +134,7 @@ describe('Auth Store', () => {
     it('should handle missing token gracefully', async () => {
       (SecureStore.getItemAsync as jest.Mock).mockResolvedValue(null);
 
-      const { result } = renderHook(() => useAuthStore());
+      const { result } = await renderHook(() => useAuthStore());
 
       await act(async () => {
         await result.current.loadToken();
@@ -149,7 +149,7 @@ describe('Auth Store', () => {
     it('should handle errors during token load', async () => {
       (SecureStore.getItemAsync as jest.Mock).mockRejectedValue(new Error('Load error'));
 
-      const { result } = renderHook(() => useAuthStore());
+      const { result } = await renderHook(() => useAuthStore());
 
       await act(async () => {
         await result.current.loadToken();

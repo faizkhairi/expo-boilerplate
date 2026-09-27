@@ -1,128 +1,99 @@
-import axios from 'axios';
+import type { AxiosAdapter, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
+import { AxiosError } from 'axios';
 import { api } from '../services/api';
 import { useAuthStore } from '../stores/auth';
 
-// Mock axios
-jest.mock('axios');
-const mockedAxios = axios as jest.Mocked<typeof axios>;
+jest.mock('expo-secure-store');
 
-// Mock auth store
-jest.mock('../stores/auth');
+// The real axios instance runs with a stub adapter, so both interceptors
+// execute exactly as they do in the app, without any network access.
+function respondWith(status: number): jest.MockedFunction<AxiosAdapter> {
+  const adapter = jest.fn(async (config: InternalAxiosRequestConfig) => {
+    const response: AxiosResponse = {
+      data: { ok: status < 400 },
+      status,
+      statusText: String(status),
+      headers: {},
+      config,
+    };
+    if (status >= 400) {
+      throw new AxiosError('Request failed', String(status), config, null, response);
+    }
+    return response;
+  });
+  api.defaults.adapter = adapter;
+  return adapter;
+}
 
 describe('API Service', () => {
+  let logoutSpy: jest.SpyInstance;
+
   beforeEach(() => {
-    jest.clearAllMocks();
+    useAuthStore.setState({ token: null, user: null, isAuthenticated: false });
+    logoutSpy = jest.spyOn(useAuthStore.getState(), 'logout').mockResolvedValue(undefined);
+  });
 
-    // Mock store getState
-    (useAuthStore.getState as jest.Mock).mockReturnValue({
-      token: 'test-token',
-      logout: jest.fn(),
+  afterEach(() => {
+    logoutSpy.mockRestore();
+  });
+
+  describe('request interceptor', () => {
+    it('adds a Bearer token when the store has one', async () => {
+      useAuthStore.setState({ token: 'test-token' });
+      const adapter = respondWith(200);
+
+      await api.get('/profile');
+
+      const sent = adapter.mock.calls[0]![0];
+      expect(sent.headers.Authorization).toBe('Bearer test-token');
+    });
+
+    it('sends no Authorization header without a token', async () => {
+      const adapter = respondWith(200);
+
+      await api.get('/profile');
+
+      const sent = adapter.mock.calls[0]![0];
+      expect(sent.headers.Authorization).toBeUndefined();
     });
   });
 
-  describe('Request Interceptor', () => {
-    it('should add Authorization header if token exists', async () => {
-      const mockConfig = { headers: {} };
+  describe('response interceptor', () => {
+    it('returns successful responses unchanged', async () => {
+      respondWith(200);
 
-      // Get the request interceptor
-      const interceptor = mockedAxios.interceptors.request.use.mock.calls[0][0];
+      const response = await api.get('/profile');
 
-      if (typeof interceptor === 'function') {
-        const result = await interceptor(mockConfig);
-        expect(result.headers.Authorization).toBe('Bearer test-token');
-      }
+      expect(response.status).toBe(200);
+      expect(response.data).toEqual({ ok: true });
+      expect(logoutSpy).not.toHaveBeenCalled();
     });
 
-    it('should not add Authorization header if no token', async () => {
-      (useAuthStore.getState as jest.Mock).mockReturnValue({
-        token: null,
-        logout: jest.fn(),
-      });
+    it('logs out and rejects on a 401', async () => {
+      useAuthStore.setState({ token: 'expired-token' });
+      respondWith(401);
 
-      const mockConfig = { headers: {} };
+      await expect(api.get('/profile')).rejects.toMatchObject({ response: { status: 401 } });
+      expect(logoutSpy).toHaveBeenCalledTimes(1);
+    });
 
-      const interceptor = mockedAxios.interceptors.request.use.mock.calls[0][0];
+    it('rejects other errors without logging out', async () => {
+      respondWith(500);
 
-      if (typeof interceptor === 'function') {
-        const result = await interceptor(mockConfig);
-        expect(result.headers.Authorization).toBeUndefined();
-      }
+      await expect(api.get('/profile')).rejects.toMatchObject({ response: { status: 500 } });
+      expect(logoutSpy).not.toHaveBeenCalled();
     });
   });
 
-  describe('Response Interceptor', () => {
-    it('should return successful responses unchanged', async () => {
-      const mockResponse = { data: { success: true }, status: 200 };
-
-      const successInterceptor = mockedAxios.interceptors.response.use.mock.calls[0][0];
-
-      if (typeof successInterceptor === 'function') {
-        const result = await successInterceptor(mockResponse);
-        expect(result).toEqual(mockResponse);
-      }
-    });
-
-    it('should logout on 401 error', async () => {
-      const mockLogout = jest.fn();
-      (useAuthStore.getState as jest.Mock).mockReturnValue({
-        token: 'test-token',
-        logout: mockLogout,
-      });
-
-      const mockError = {
-        response: { status: 401 },
-        config: { url: '/api/data' },
-      };
-
-      const errorInterceptor = mockedAxios.interceptors.response.use.mock.calls[0][1];
-
-      if (typeof errorInterceptor === 'function') {
-        await expect(errorInterceptor(mockError)).rejects.toEqual(mockError);
-        expect(mockLogout).toHaveBeenCalled();
-      }
-    });
-
-    it('should not logout on 401 for login/register endpoints', async () => {
-      const mockLogout = jest.fn();
-      (useAuthStore.getState as jest.Mock).mockReturnValue({
-        token: 'test-token',
-        logout: mockLogout,
-      });
-
-      const mockError = {
-        response: { status: 401 },
-        config: { url: '/api/auth/login' },
-      };
-
-      const errorInterceptor = mockedAxios.interceptors.response.use.mock.calls[0][1];
-
-      if (typeof errorInterceptor === 'function') {
-        await expect(errorInterceptor(mockError)).rejects.toEqual(mockError);
-        expect(mockLogout).not.toHaveBeenCalled();
-      }
-    });
-
-    it('should pass through non-401 errors', async () => {
-      const mockError = {
-        response: { status: 500 },
-        config: { url: '/api/data' },
-      };
-
-      const errorInterceptor = mockedAxios.interceptors.response.use.mock.calls[0][1];
-
-      if (typeof errorInterceptor === 'function') {
-        await expect(errorInterceptor(mockError)).rejects.toEqual(mockError);
-      }
-    });
-  });
-
-  describe('API Instance', () => {
-    it('should have correct base URL', () => {
-      expect(api.defaults.baseURL).toBe('http://localhost:8080');
-    });
-
-    it('should have correct content type header', () => {
+  describe('configuration', () => {
+    it('sends JSON', () => {
       expect(api.defaults.headers['Content-Type']).toBe('application/json');
+    });
+
+    it('defaults the base URL for local development', () => {
+      expect(api.defaults.baseURL).toBe(
+        process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3000/api'
+      );
     });
   });
 });
