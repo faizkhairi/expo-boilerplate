@@ -28,7 +28,7 @@ export default function ProfileScreen() {
 
         <View className="bg-blue-50 rounded-lg p-4 border border-blue-200">
           <Text className="text-sm text-blue-800">
-            💡 Your profile information is securely stored and can be updated through the app's settings or API.
+            💡 Your profile information is securely stored and can be updated through the app&apos;s settings or API.
           </Text>
         </View>
       </View>

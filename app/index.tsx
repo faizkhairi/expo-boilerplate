@@ -8,7 +8,7 @@ export default function Index() {
 
   useEffect(() => {
     loadToken();
-  }, []);
+  }, [loadToken]);
 
   if (isLoading) {
     return (

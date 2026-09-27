@@ -11,7 +11,7 @@ export default function HomeScreen() {
           Welcome back{user?.name ? `, ${user.name}` : ''}!
         </Text>
         <Text className="text-gray-600 mb-8">
-          You're successfully logged in to your account.
+          You&apos;re successfully logged in to your account.
         </Text>
 
         <View className="space-y-4">
