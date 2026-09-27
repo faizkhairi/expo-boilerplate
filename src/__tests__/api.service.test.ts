@@ -87,6 +87,24 @@ describe('API Service', () => {
       }
     );
 
+    it('still logs out on a 401 from a route that only shares the prefix', async () => {
+      respondWith(401);
+
+      await expect(api.get('/auth/login-history')).rejects.toMatchObject({
+        response: { status: 401 },
+      });
+      expect(logoutSpy).toHaveBeenCalledTimes(1);
+    });
+
+    it('ignores the query string when matching auth attempts', async () => {
+      respondWith(401);
+
+      await expect(api.post('/auth/login?next=%2Fprofile', {})).rejects.toMatchObject({
+        response: { status: 401 },
+      });
+      expect(logoutSpy).not.toHaveBeenCalled();
+    });
+
     it('rejects other errors without logging out', async () => {
       respondWith(500);
 
